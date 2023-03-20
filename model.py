@@ -52,9 +52,9 @@ class MODEL(nn.Module):
         seqlen = exercise_data.shape[1]
         exercise_node_embedding = self.exercise_embed
         kc_node_mebedding = self.kc_embed
-        exercise_embedding = torch.cat([att(exercise_node_embedding, kc_node_mebedding, adj_exercise_kc) for att in self.exercise_kc_attentions], dim=1).view(self.n_exercise, self.exercise_embed_dim ,self.nheads).mean(2)
+        exercise_embedding = torch.cat([att(exercise_node_embedding, kc_node_mebedding, adj_exercise_kc) for att in self.exercise_kc_attentions], dim=1).view(self.n_exercise, self.exercise_embed_dim ,self.nheads).mean(2) #[16891, 64]
         exercise_embedding_add_zero = torch.cat(
-            [utils.varible(torch.zeros(1, exercise_embedding.shape[1]), self.params.gpu), exercise_embedding], dim=0)
+            [utils.varible(torch.zeros(1, exercise_embedding.shape[1]), self.params.gpu), exercise_embedding], dim=0) #[16892, 64]
         slice_exercise_data = torch.chunk(exercise_data, seqlen, 1)
         slice_exercise_embedd_data = []
         for i, single_slice_exercise_data_index in enumerate(slice_exercise_data):
@@ -87,7 +87,7 @@ class MODEL(nn.Module):
         pred = self.fc2(y)
         pred = pred.squeeze(-1).view(batch_size * (seqlen - 1), -1)
         target_1d = target
-        mask = target_1d.ge(0)
+        mask = target_1d.ge(0) #greater than or equal to
         pred_1d = pred.view(-1, 1)
         filtered_pred = torch.masked_select(pred_1d, mask)
         filtered_target = torch.masked_select(target_1d, mask)
